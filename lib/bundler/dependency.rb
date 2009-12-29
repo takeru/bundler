@@ -2,7 +2,7 @@ module Bundler
   class InvalidEnvironmentName < StandardError; end
 
   class Dependency
-    attr_reader :name, :version, :require_as, :only, :except
+    attr_reader :name, :version, :require_as, :only, :except, :ignore_dependencies
     attr_accessor :source
 
     def initialize(name, options = {}, &block)
@@ -16,7 +16,9 @@ module Bundler
       @only       = options["only"]
       @except     = options["except"]
       @source     = options["source"]
+      @ignore_dependencies = options["ignore_dependencies"]
       @block      = block
+      @options    = options
 
       if (@only && @only.include?("rubygems")) || (@except && @except.include?("rubygems"))
         raise InvalidEnvironmentName, "'rubygems' is not a valid environment name"
@@ -52,12 +54,12 @@ module Bundler
     end
 
     def to_gem_dependency
-      @gem_dep ||= Gem::Dependency.new(name, version)
+      @gem_dep ||= Gem::DependencyExt.new(name, version, @options)
     end
 
     def ==(o)
-      [name, version, require_as, only, except] ==
-        [o.name, o.version, o.require_as, o.only, o.except]
+      [name, version, require_as, only, except, ignore_dependencies] ==
+        [o.name, o.version, o.require_as, o.only, o.except, o.ignore_dependencies]
     end
 
   end

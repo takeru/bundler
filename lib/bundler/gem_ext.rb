@@ -30,4 +30,12 @@ module Gem
       end
     end
   end
+
+  class DependencyExt < Dependency
+    attr_reader :options
+    def initialize(name, version, options={})
+      super(name, version)
+      @options = options
+    end
+  end
 end

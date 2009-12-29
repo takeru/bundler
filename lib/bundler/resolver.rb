@@ -198,13 +198,14 @@ module Bundler
       # Now, we have to loop through all child dependencies and add them to our
       # array of requirements.
       debug { "    Dependencies"}
+      ignore_dependencies = requirement.options["ignore_dependencies"] rescue nil
       spec.dependencies.each do |dep|
         next if dep.type == :development
         debug { "    * #{dep.name} (#{dep.version_requirements})" }
         dep.required_by.replace(requirement.required_by)
         dep.required_by << requirement
         reqs << dep
-      end
+      end unless ignore_dependencies
 
       # We create a savepoint and mark it by the name of the requirement that caused
       # the gem to be activated. If the activated gem ever conflicts, we are able to
